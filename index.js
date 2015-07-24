@@ -1,16 +1,9 @@
 var support = require('./utils').support,
     dispatchClick = require("./utils").dispatchClick;
 
-if (typeof document.addEventListener !== 'function') {
-    throw new Error('document.addEventListener doesnt exist');
-}
 
-module.exports = function(ele) {
-    document.addEventListener('DOMContentLoaded', function() {
-        if(!support) {
-            throw new Error('We\'re not in the browser doesnt exist');
-        }
-
+module.exports = function(ele, delay) {
+    if (document.addEventListener) {
         var cover = document.createElement('div'),
             body = document.body,
             coverStyle = cover.style,
@@ -24,9 +17,7 @@ module.exports = function(ele) {
             'transform: translate3d(0,0,0);',
             'position: fixed;',
             'top: 0;',
-            'right: 0;',
             'left: 0;',
-            'bottom: 0;',
             'opacity: 0;',
             'z-index: 9;',
             'pointer-events: none'
@@ -36,18 +27,22 @@ module.exports = function(ele) {
         ele.addEventListener('scroll', function scroll() {
             if(!scrollStarted) {
                 coverStyle.pointerEvents = 'auto';
+                coverStyle.right = 0;
+                coverStyle.bottom = 0;
                 scrollStarted = true;
             }
             clearTimeout(timer);
 
             timer = setTimeout(function(){
                 coverStyle.pointerEvents = 'none';
+                coverStyle.right = '';
+                coverStyle.bottom = '';
                 scrollStarted = false;
                 if(clicked) {
                     dispatchClick(pos);
                     clicked = false;
                 }
-            }, 500);
+            }, delay);
         }, false);
 
         // capture all clicks and store x, y coords for later
@@ -58,5 +53,5 @@ module.exports = function(ele) {
                 clicked = true;
             }
         }, false);
-    }, false);
+    }
 }
