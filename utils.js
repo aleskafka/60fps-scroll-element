@@ -5,7 +5,6 @@ exports.support = (function support() {
 }());
 
 var keys = [
-    'canBubble', 'cancelable',
     'screenX', 'screenY', 'clientX', 'clientY',
     'ctrlKey', 'altKey', 'shiftKey', 'metaKey',
     'button'
@@ -22,7 +21,11 @@ exports.serializeClick = function(e) {
 
 exports.dispatchClick = function(serialized) {
     var $el, event;
-    if ($el = document.elementFromPoint(serialized.x, serialized.y)) {
+    if ($el = document.elementFromPoint(serialized.clientX, serialized.clientY)) {
+        serialized.bubbles = true;
+        serialized.cancelable = true;
+        serialized.view = window;
+
         event = new MouseEvent('click', serialized);
         event.synthetic = true;
 
