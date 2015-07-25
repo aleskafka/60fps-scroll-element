@@ -1,18 +1,15 @@
-var support = require('./utils').support,
-    dispatchClick = require("./utils").dispatchClick;
+var support = require('./utils').support;
+var serializeClick = require("./utils").serializeClick;
+var dispatchClick = require("./utils").dispatchClick;
 
 
 module.exports = function(ele, delay) {
     if (support && document.addEventListener) {
-        var cover = document.createElement('div'),
-            body = document.body,
-            coverStyle = cover.style,
-            scrollStarted = false,
-            timer,
-            clicked = false,
-            pos = { x: 0, y: 0 };
+        var cover = document.createElement('div');
+        var started = false;
+        var timer, clicked;
 
-        coverStyle.cssText = [
+        cover.style.cssText = [
             '-webkit-transform: translate3d(0,0,0);',
             'transform: translate3d(0,0,0);',
             'position: fixed;',
@@ -24,20 +21,22 @@ module.exports = function(ele, delay) {
             'z-index: 9;',
             'pointer-events: none'
         ].join('');
-        body.appendChild(cover);
+
+        document.body.appendChild(cover);
 
         ele.addEventListener('scroll', function scroll() {
-            if(!scrollStarted) {
-                coverStyle.pointerEvents = 'auto';
-                scrollStarted = true;
+            if (started===false) {
+                started = true;
+                cover.style.pointerEvents = 'auto';
             }
             clearTimeout(timer);
 
             timer = setTimeout(function(){
-                coverStyle.pointerEvents = 'none';
-                scrollStarted = false;
-                if(clicked) {
-                    dispatchClick(pos);
+                cover.style.pointerEvents = 'none';
+                started = false;
+
+                if (clicked) {
+                    dispatchClick(clicked);
                     clicked = false;
                 }
             }, delay||500);
@@ -45,11 +44,9 @@ module.exports = function(ele, delay) {
 
         // capture all clicks and store x, y coords for later
         document.addEventListener('click', function clickCatcher(event) {
-            if(event.target === cover && !event.synthetic) {
-                pos.x = event.clientX;
-                pos.y = event.clientY;
-                clicked = true;
+            if (event.target === cover && !event.synthetic) {
+                clicked = serializeClick(event);
             }
-        }
+        }, false);
     }
 }

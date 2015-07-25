@@ -4,19 +4,28 @@ exports.support = (function support() {
     return element.style.pointerEvents === 'auto';
 }());
 
-exports.dispatchClick = function(coords) {
-    var event = document.createEvent('MouseEvent'),
-        elem = document.elementFromPoint(coords.x, coords.y);
+var keys = [
+    'canBubble', 'cancelable',
+    'screenX', 'screenY', 'clientX', 'clientY',
+    'ctrlKey', 'altKey', 'shiftKey', 'metaKey',
+    'button'
+];
 
-    event.initMouseEvent(
-        'click',
-        true /* bubble */, true /* cancelable */,
-        window, null,
-        coords.x, coords.y, 0, 0, /* coordinates */
-        false, false, false, false, /* modifier keys */
-        0 /*left*/, null
-    );
-    event.synthetic = true;
+exports.serializeClick = function(e) {
+    var serialized = {};
+    keys.forEach(function(key) {
+        serialized[key] = e[key];
+    });
 
-    elem.dispatchEvent(event);
+    return serialized;
+}
+
+exports.dispatchClick = function(serialized) {
+    var $el, event;
+    if ($el = document.elementFromPoint(serialized.x, serialized.y)) {
+        event = new MouseEvent('click', serialized);
+        event.synthetic = true;
+
+        $el.dispatchEvent(event);
+    }
 }
