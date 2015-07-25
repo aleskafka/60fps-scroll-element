@@ -2,7 +2,7 @@ var support = require('./utils').support,
     dispatchClick = require("./utils").dispatchClick;
 
 
-module.exports = function(ele) {
+module.exports = function(ele, delay) {
     if (support && document.addEventListener) {
         var cover = document.createElement('div'),
             body = document.body,
@@ -40,7 +40,7 @@ module.exports = function(ele) {
                     dispatchClick(pos);
                     clicked = false;
                 }
-            }, 500);
+            }, delay||500);
         }, false);
 
         // capture all clicks and store x, y coords for later
