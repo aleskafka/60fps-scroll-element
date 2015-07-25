@@ -1,16 +1,9 @@
 var support = require('./utils').support,
     dispatchClick = require("./utils").dispatchClick;
 
-if (typeof document.addEventListener !== 'function') {
-    throw new Error('document.addEventListener doesnt exist');
-}
 
 module.exports = function(ele) {
-    document.addEventListener('DOMContentLoaded', function() {
-        if(!support) {
-            throw new Error('We\'re not in the browser doesnt exist');
-        }
-
+    if (support && document.addEventListener) {
         var cover = document.createElement('div'),
             body = document.body,
             coverStyle = cover.style,
@@ -57,6 +50,6 @@ module.exports = function(ele) {
                 pos.y = event.clientY;
                 clicked = true;
             }
-        }, false);
-    }, false);
+        }
+    }
 }
