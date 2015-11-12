@@ -9,6 +9,7 @@ module.exports = function(ele, delay) {
         var started = false;
         var timer, clicked;
 
+        cover.id = 'fps60-container';
         cover.style.cssText = [
             '-webkit-transform: translate3d(0,0,0);',
             'transform: translate3d(0,0,0);',
