@@ -3,14 +3,12 @@ var serializeClick = require("./utils").serializeClick;
 var dispatchClick = require("./utils").dispatchClick;
 
 
-module.exports = function(ele, delay) {
+module.exports = function($parent, $element, delay) {
     if (support && document.addEventListener) {
-        var cover = document.createElement('div');
         var started = false;
         var timer, clicked;
 
-        cover.id = 'fps60-container';
-        cover.style.cssText = [
+        $element.style.cssText = [
             '-webkit-transform: translate3d(0,0,0);',
             'transform: translate3d(0,0,0);',
             'position: fixed;',
@@ -23,17 +21,15 @@ module.exports = function(ele, delay) {
             'pointer-events: none'
         ].join('');
 
-        document.body.appendChild(cover);
-
-        ele.addEventListener('scroll', function scroll() {
+        $parent.addEventListener('scroll', function scroll() {
             if (started===false) {
                 started = true;
-                cover.style.pointerEvents = 'auto';
+                $element.style.pointerEvents = 'auto';
             }
-            clearTimeout(timer);
 
-            timer = setTimeout(function(){
-                cover.style.pointerEvents = 'none';
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                $element.style.pointerEvents = 'none';
                 started = false;
 
                 if (clicked) {
@@ -45,9 +41,16 @@ module.exports = function(ele, delay) {
 
         // capture all clicks and store x, y coords for later
         document.addEventListener('click', function clickCatcher(event) {
-            if (event.target === cover && !event.synthetic) {
+            if (event.target===cover && !event.synthetic) {
                 clicked = serializeClick(event);
             }
         }, false);
+    }
+
+    return function() {
+        clearTimeout(timer);
+        $element.style.cssText = '';
+        document.removeEventListener('click', clickCatcher, false);
+        $parent.removeEventListener('scroll', scroll);
     }
 }
