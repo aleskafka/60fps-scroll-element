@@ -41,7 +41,7 @@ module.exports = function($parent, $element, delay) {
 
         // capture all clicks and store x, y coords for later
         document.addEventListener('click', function clickCatcher(event) {
-            if (event.target===cover && !event.synthetic) {
+            if (event.target===$element && !event.synthetic) {
                 clicked = serializeClick(event);
             }
         }, false);
