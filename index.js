@@ -21,7 +21,7 @@ module.exports = function($parent, $element, delay) {
             'pointer-events: none'
         ].join('');
 
-        $parent.addEventListener('scroll', function scroll() {
+        var onScroll = function(event) {
             if (started===false) {
                 started = true;
                 $element.style.pointerEvents = 'auto';
@@ -37,20 +37,24 @@ module.exports = function($parent, $element, delay) {
                     clicked = false;
                 }
             }, delay||500);
-        }, false);
+        }
 
-        // capture all clicks and store x, y coords for later
-        document.addEventListener('click', function clickCatcher(event) {
+        var onClick = function(event) {
             if (event.target===$element && !event.synthetic) {
                 clicked = serializeClick(event);
             }
-        }, false);
-    }
+        }
 
-    return function() {
-        clearTimeout(timer);
-        $element.style.cssText = '';
-        document.removeEventListener('click', clickCatcher, false);
-        $parent.removeEventListener('scroll', scroll);
+        // handle pointerEvents on scroll event
+        $parent.addEventListener('scroll', onScroll, false);
+        // capture all clicks and store x, y coords for later
+        document.addEventListener('click', onClick, false);
+
+        return function() {
+            clearTimeout(timer);
+            $element.style.cssText = '';
+            document.removeEventListener('click', onClick, false);
+            $parent.removeEventListener('scroll', onScroll, false);
+        }
     }
 }
